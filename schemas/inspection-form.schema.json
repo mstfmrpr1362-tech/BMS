@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tehran.example/bms/inspection-form.schema.json",
+  "title": "Tehran Road Bridge BMS Inspection Form",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "inspectionNo",
+    "bridgeCode",
+    "inspectionType",
+    "startedAt",
+    "endedAt",
+    "inspectors",
+    "weather",
+    "gps",
+    "overviewPhotos",
+    "immediateSafety",
+    "defects"
+  ],
+  "properties": {
+    "inspectionNo": { "type": "string", "minLength": 3 },
+    "bridgeCode": { "type": "string", "minLength": 1 },
+    "inspectionType": {
+      "type": "string",
+      "enum": ["periodic", "special", "post_incident", "post_repair"]
+    },
+    "startedAt": { "type": "string", "format": "date-time" },
+    "endedAt": { "type": "string", "format": "date-time" },
+    "inspectors": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "type": "string", "minLength": 2 }
+    },
+    "weather": {
+      "type": "string",
+      "enum": ["clear", "cloudy", "rain", "snow", "wind", "dust", "other"]
+    },
+    "trafficCondition": {
+      "type": "string",
+      "enum": ["light", "normal", "heavy", "restricted", "closed"]
+    },
+    "gps": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["lat", "lng"],
+      "properties": {
+        "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+        "lng": { "type": "number", "minimum": -180, "maximum": 180 },
+        "accuracyMeters": { "type": "number", "minimum": 0 }
+      }
+    },
+    "overviewPhotos": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/photo" }
+    },
+    "immediateSafety": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "settlement",
+        "majorCrack",
+        "vehicleImpact",
+        "fallingConcreteRisk",
+        "abnormalDeflection",
+        "bearingOrJointCriticalDamage",
+        "scourOrFoundationExposure"
+      ],
+      "properties": {
+        "settlement": { "type": "boolean" },
+        "majorCrack": { "type": "boolean" },
+        "vehicleImpact": { "type": "boolean" },
+        "fallingConcreteRisk": { "type": "boolean" },
+        "abnormalDeflection": { "type": "boolean" },
+        "bearingOrJointCriticalDamage": { "type": "boolean" },
+        "scourOrFoundationExposure": { "type": "boolean" },
+        "escalationNote": { "type": "string" }
+      }
+    },
+    "defects": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/defect" }
+    },
+    "priorityScore": { "type": "number", "minimum": 0, "maximum": 100 },
+    "workflowStatus": {
+      "type": "string",
+      "enum": ["draft", "submitted", "needs_revision", "approved", "escalated", "closed"]
+    }
+  },
+  "$defs": {
+    "photo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fileName", "takenAt", "lat", "lng", "caption"],
+      "properties": {
+        "fileName": { "type": "string", "pattern": "^BRG-.+_INSP-.+_.+\\.jpg$" },
+        "takenAt": { "type": "string", "format": "date-time" },
+        "lat": { "type": "number", "minimum": -90, "maximum": 90 },
+        "lng": { "type": "number", "minimum": -180, "maximum": 180 },
+        "direction": { "type": "string" },
+        "caption": { "type": "string", "minLength": 3 }
+      }
+    },
+    "defect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["defectNo", "component", "defectType", "severity", "extent", "locationDescription", "photos", "recommendedAction"],
+      "properties": {
+        "defectNo": { "type": "string" },
+        "component": {
+          "type": "string",
+          "enum": ["deck", "pavement", "girder", "slab", "steel_connection", "bearing", "expansion_joint", "abutment", "pier", "wing_wall", "foundation", "drainage", "parapet", "lighting_signage", "utilities", "other"]
+        },
+        "defectType": { "type": "string", "minLength": 2 },
+        "severity": { "type": "integer", "minimum": 1, "maximum": 4 },
+        "extent": {
+          "type": "string",
+          "enum": ["localized", "limited", "widespread", "critical"]
+        },
+        "locationDescription": { "type": "string", "minLength": 3 },
+        "measurements": {
+          "type": "object",
+          "additionalProperties": { "type": ["number", "string"] }
+        },
+        "photos": {
+          "type": "array",
+          "minItems": 2,
+          "items": { "$ref": "#/$defs/photo" }
+        },
+        "recommendedAction": {
+          "type": "string",
+          "enum": ["monitor", "routine_repair", "short_term_repair", "urgent_repair", "special_inspection", "traffic_restriction"]
+        },
+        "needsMonitoring": { "type": "boolean" }
+      }
+    }
+  }
+}
